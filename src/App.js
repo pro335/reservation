@@ -1,25 +1,40 @@
-import logo from './logo.svg';
+import React from 'react';
+import PropTypes from 'prop-types';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { Provider } from "react-redux";
+
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
+import withWidth from '@material-ui/core/withWidth';
+
+import LandingPage from './pages/LandingPage';
+import AddPage from './pages/AddPage';
+
+import store from './redux/store/configureStore';
+
 import './App.css';
 
-function App() {
+function App(props) {
+  const { width } = props;
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+
+    <Grid container>
+      <Provider store={store}>
+      {/* <Typography gutterBottom>
+        Current width: {width}
+      </Typography> */}
+        <Router>
+          <Route exact path="/" component={LandingPage} />
+          <Route exact path="/new" component={AddPage} />
+        </Router>
+      </Provider>
+    </Grid>
   );
 }
 
-export default App;
+App.propTypes = {
+  width: PropTypes.oneOf(['lg', 'md', 'sm', 'xl', 'xs']).isRequired,
+};
+
+export default withWidth()(App);
