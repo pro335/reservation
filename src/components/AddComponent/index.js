@@ -56,7 +56,7 @@ export default function AddPage() {
       id: actionFlag === 0 ? uuidv1(): reservation.id,
       customerName: customerName,
       reservationDateTime: reservationDateTime,
-      reservationState: reservationState
+      reservationState: reservationDateTime < moment().format("YYYY-MM-DDThh:mm") && reservationState === 'upcoming' ? 'finished': reservationState
     }
 
     dispatch({

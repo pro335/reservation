@@ -1,9 +1,10 @@
-import {GET_RESERVATIONS, SET_ACTION_FLAG, SET_STATE_FLAG, ADD_RESERVATION, DELETE_RESERVATION, UPDATE_RESERVATION, RESERVATION_UPDATED} from '../constants/ActionTypes'
+import {GET_RESERVATIONS, SET_ACTION_FLAG, SET_STATE_FLAG, ADD_RESERVATION, DELETE_RESERVATION, UPDATE_RESERVATION, RESERVATION_UPDATED, SET_FILTER_DATE} from '../constants/ActionTypes'
 const initialState = {
     reservations : [],
     reservation : {},
     actionFlag: 0,  // 0: Add, 1: Update
     stateFlag: 0,  // 0: Whole, 1: upcoming, 2: finished/cancelled
+    filterDate: null,
 }
 const reservationReducer = (state = initialState, action) => {
     switch (action.type) {
@@ -67,6 +68,13 @@ const reservationReducer = (state = initialState, action) => {
                 ...state,
                 stateFlag: action.payload,
             };
+
+        case SET_FILTER_DATE:
+            return {
+                ...state,
+                filterDate: action.payload,
+            };
+            
     
         default:
             return state

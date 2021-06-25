@@ -1,9 +1,10 @@
 import React from 'react';
-import { UPDATE_RESERVATION } from '../../redux/constants/ActionTypes';
+import { UPDATE_RESERVATION, SET_FILTER_DATE } from '../../redux/constants/ActionTypes';
+import moment from 'moment'; 
 import PropTypes from 'prop-types';
 import { useDispatch } from "react-redux";
 import { useHistory } from 'react-router-dom'
-import { lighten, makeStyles, withStyles } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -20,6 +21,14 @@ import IconButton from '@material-ui/core/IconButton';
 import EditIcon from '@material-ui/icons/Edit';
 
 import { useSelector } from "react-redux";
+
+import 'date-fns';
+import DateFnsUtils from '@date-io/date-fns';
+import {
+  MuiPickersUtilsProvider,
+  KeyboardTimePicker,
+  KeyboardDatePicker,
+} from '@material-ui/pickers';
 
 import useStyles from './useStyles';
 
@@ -125,20 +134,32 @@ export default function ReservationTable() {
     for( let i = 0 ; i < wholeReservations.length; i ++) {
       switch(stateFlag) {
         case 0:
-          tempReservations.push(wholeReservations[i]);
+          if(state.reservations.filterDate === null)
+            tempReservations.push(wholeReservations[i]);
+          else if(moment(state.reservations.filterDate).format('yyyy-MM-DD') === moment(wholeReservations[i].reservationDateTime).format('yyyy-MM-DD'))
+              tempReservations.push(wholeReservations[i]);
           break;
         case 1:
-          if(wholeReservations[i].reservationState === "upcoming")
-            tempReservations.push(wholeReservations[i]);
+          if(wholeReservations[i].reservationState === "upcoming") {
+            if(state.reservations.filterDate === null)
+              tempReservations.push(wholeReservations[i]);
+            else if(moment(state.reservations.filterDate).format('yyyy-MM-DD') === moment(wholeReservations[i].reservationDateTime).format('yyyy-MM-DD'))
+                tempReservations.push(wholeReservations[i]);
+          }
           break;
         case 2:
-          if(wholeReservations[i].reservationState === "finished" || wholeReservations[i].reservationState === "cancelled")
-            tempReservations.push(wholeReservations[i]);
+          if(wholeReservations[i].reservationState === "finished" || wholeReservations[i].reservationState === "cancelled") {
+            if(state.reservations.filterDate === null)
+              tempReservations.push(wholeReservations[i]);
+            else if(moment(state.reservations.filterDate).format('yyyy-MM-DD') === moment(wholeReservations[i].reservationDateTime).format('yyyy-MM-DD'))
+                tempReservations.push(wholeReservations[i]);
+          }
           break;
       }
     }
     return tempReservations
   });
+  const selectedDate = useSelector(state => state.reservations.filterDate);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -167,6 +188,13 @@ export default function ReservationTable() {
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
+  };
+
+  const handleDateChange = (date) => {
+    dispatch({
+      type: SET_FILTER_DATE,
+      payload: date
+    })
   };
 
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
@@ -202,7 +230,21 @@ export default function ReservationTable() {
     <Container className={classes.root}>
       <Paper className={classes.paper}>
         <Typography variant="h4"> {determineLabel(stateFlag)}</Typography>
-
+        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+          <KeyboardDatePicker
+            // variant="inline"
+            clearable
+            format="yyyy-MM-dd"
+            margin="normal"
+            id="date-picker-inline"
+            label="Please pick a date"
+            value={selectedDate}
+            onChange={handleDateChange}
+            KeyboardButtonProps={{
+              'aria-label': 'change date',
+            }}
+          />
+        </MuiPickersUtilsProvider>
         <TableContainer>
           <Table
             className={classes.table}
